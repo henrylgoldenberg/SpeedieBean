@@ -46,7 +46,8 @@
     "reactjs-popup": "^2.0.4",
     "realm": "^10.0.0-beta.6",
     "styled-components": "^5.1.1",
-    "tinymask": "^1.0.2"
+    "tinymask": "^1.0.2",
+    "yarn": "^1.22.10"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",
