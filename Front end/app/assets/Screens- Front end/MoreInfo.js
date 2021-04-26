@@ -33,7 +33,7 @@ const rowsPerPage = 2;
 
 
 
-export default class MiaOrders extends React.Component {
+export default class MoreInfo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -46,10 +46,7 @@ export default class MiaOrders extends React.Component {
       newPhone: "",
       newDeliveryDate: "",
       newAddress: "",
-      visible: false,
       newQuantity: 0,
-      popupinfo: "",
-      isVisible: false,
     };
 
     this.newOrderPressHandler = this.newOrderPressHandler.bind(this);
@@ -59,7 +56,6 @@ export default class MiaOrders extends React.Component {
     this.archivedPressHandler = this.archivedPressHandler.bind(this);
     this.addOrderPressHandler = this.addOrderPressHandler.bind(this);
     this._handleAccountPress = this._handleAccountPress.bind(this);
-    this.displayModal = this.displayModal.bind(this);
   }
 
   componentDidMount() {
@@ -156,8 +152,7 @@ export default class MiaOrders extends React.Component {
     var email = params.user;
     var loc = params.location;
     var employeeRole = params.role;
-    var passwordLength = params.pLength;
-    this.props.navigation.navigate("AccountInfo", {user: email, location: loc, role: employeeRole, pLength: passwordLength});
+    this.props.navigation.navigate("AccountInfo", {user: email, location: loc, role: employeeRole});
   }
 
   inventoryPressHandler() {
@@ -165,40 +160,14 @@ export default class MiaOrders extends React.Component {
     var email = params.user;
     var loc = params.location;
     var employeeRole = params.role;
-    var passwordLength = params.pLength;
-    this.props.navigation.navigate("Inventory", {user: email, location: loc, role: employeeRole, pLength: passwordLength});
+    this.props.navigation.navigate("Inventory", {user: email, location: loc, role: employeeRole});
   }
 
   refreshScreen = () => {
     this.getData();
   };
 
-  popUps(i,val){
-    if (this.state.visible){
-      return(
-        <Dialog
-                          visible={this.state.visible}
-                          dialogTitle={<DialogTitle title="More Information" />}
-                          onTouchOutside={() => { this.setState({ visible: false });}} >
-                          
-                            
-                          <DialogContent>
-                            <div> Customer: {val.names[i]}</div>
-                            <div> Phone Number: {val.phoneNumbers[i]}</div>
-                            <div> Location: {val.locations[i]}</div>
-                            <div> Address: {val.addresses[i]}</div>
-                            <div> Quarts: {val.quarts[i]}</div>
-                            <div> HGs: {val.halfGals[i]}</div>
-                          </DialogContent>
-                        </Dialog>
 
-
-      )
-    }
-  }
- 
-
-  
   fillOrder(i, orderStatus, qts, hgs) {
     const { params } = this.props.navigation.state;
     var user = params.user;
@@ -209,16 +178,13 @@ export default class MiaOrders extends React.Component {
         orderNumber: i + 1,
         newStatus: orderStatus,
         filledBy: user,
-        //bottlesReturned: 1,
+        bottlesReturned: 1,
         quarts: qts,
         halfGals: hgs,
       }),
     }).then(this.refreshScreen);
   };
 
-  displayModal(show){
-    this.setState({isVisible: show})
-  }
 
   render() {
     if (this.state.isLoading) {
@@ -233,127 +199,30 @@ export default class MiaOrders extends React.Component {
       this.state.dataSource.map((val, key) => {
         arrLength = val.phoneNumbers.length;
       });
-
-      
-      var popups = [];
-
-        for(let index = 0;index < arrLength;index++)
-        popups.push(
-        this.state.dataSource.map((val, index) => {
-            
-              return(
-                
-    
-                          <DialogContent>
-                            <div> Customer: {val.names[index]}</div>
-                            <div> Phone Number: {val.phoneNumbers[index]}</div>
-                            <div> Location: {val.locations[index]}</div>
-                            <div> Address: {val.addresses[index]}</div>
-                            <div> Quarts: {val.quarts[index]}</div>
-                            <div> HGs: {val.halfGals[index]}</div>
-                          </DialogContent> 
-                        
-
-             ) 
-              }
-        )
-        )
-            
-      
       for (let i = 0; i < arrLength; i++) {
         
         orders.push(
           this.state.dataSource.map((val, index) => {
-            console.log(i)
+
             var popupinfo = <div> <div> Customer: {val.names[i]}</div>
                  <div> Phone Number: {val.phoneNumbers[i]}</div>
                   <div> Location: {val.locations[i]}</div>
                  <div> Address: {val.addresses[i]}</div>
                  <div> Quarts: {val.quarts[i]}</div>
                 <div> HGs: {val.halfGals[i]}</div> </div>
-              if (val.orderStatuses[i] == "A") {
-                return (
-                    
+              
+            return (  
                 <View>
-                  <DataTable.Row style={i % 2? { background : "#D3D3D3" }:{ background : "white" }} key={i} >
-                    {/* <DataTable.Cell style={{flex: .2}} >
-                    <Button
-                            title="+"
-                            onPress={() => { this.setState({ visible: true }); }}
-                          />
-                          {this.popUps(i,val)}
-
-                        {/* <Dialog
-                          visible={this.state.visible}
-                          dialogTitle={<DialogTitle title="More Information" />}
-                          onTouchOutside={() => { this.setState({ visible: false });}} >
-                          {this.popUps(i,val)}
-                            
-                          <DialogContent>
-                            {popupinfo}
-                          </DialogContent>
-                        </Dialog>
-                        
-                    </DataTable.Cell> */}
-                    <DataTable.Cell style={{flex: 1}} >{val.names[i]}</DataTable.Cell>
-                    <DataTable.Cell style={{flex: 1}}
-                      onPress={() => window.open('https://www.google.com/maps/search/?api=1&query=' + JSON.stringify(val.addresses[i]) + '+' +  JSON.stringify(val.locations[i]), 'blank')}>
-                      {val.addresses[i]}</DataTable.Cell>
-                    <DataTable.Cell style={{flex: .3}}>
-                      <TouchableOpacity
-                        style={styles.editOrder}
-                        onPress={this.fillOrder.bind(this, i, "I",0,0)}
-                      >
-                        <Text style={styles.editText}>Claim</Text>
-                      </TouchableOpacity>
-                    </DataTable.Cell>
-                  </DataTable.Row>
-                  <DataTable.Row style={i % 2? { background : "#D3D3D3" }:{ background : "white" }} key={i} >
-                    <DataTable.Cell style={{flex: .6}} >{val.deliveryDates[i]}</DataTable.Cell>
-                    <DataTable.Cell style={{flex: .8}} >{val.phoneNumbers[i]}</DataTable.Cell>
-                    <DataTable.Cell style={{flex: .5}} >Quarts: {val.quarts[i]},</DataTable.Cell>
-                    <DataTable.Cell style={{flex: .4}} >HGs: {val.halfGals[i]}</DataTable.Cell>
-                  </DataTable.Row>
-
+                    <div> Customer: {val.names[i]}</div>
+                    <div> Phone Number: {val.phoneNumbers[i]}</div>
+                    <div> Location: {val.locations[i]}</div>
+                    <div> Address: {val.addresses[i]}</div>
+                    <div> Quarts: {val.quarts[i]}</div>
+                    <div> HGs: {val.halfGals[i]}</div>    
                 </View>
                 );
-              } else {
-                return (
-                  <DataTable.Row style={i % 2? { background : "#D3D3D3" }:{ background : "white" }} key={i}>
-                    <DataTable.Cell style={{flex: .2}} >
-                        <Button
-                            title="+"
-                            onPress={() => { this.setState({ visible: true }); }}
-                          />
-                          
-                        <Dialog
-                          visible={this.state.visible}
-                          dialogTitle={<DialogTitle title="More Information" />}
-                          onTouchOutside={() => { this.setState({ visible: false });}} >
-                            
-                          <DialogContent>
-                            {popupinfo}
-                          </DialogContent>
-                        </Dialog>
-                    </DataTable.Cell>
-                    <DataTable.Cell style={{flex: .5}} >{val.deliveryDates[i]}</DataTable.Cell>
-                    <DataTable.Cell style={{flex: 1}}
-                      onPress={() => window.open('https://www.google.com/maps/search/?api=1&query=' + JSON.stringify(val.addresses[i]) + '+' +  JSON.stringify(val.locations[i]), 'blank')}>
-                      {val.addresses[i]}</DataTable.Cell>
-                    <DataTable.Cell style={{flex: .3}}>
-                      <TouchableOpacity
-                        style={styles.reopenOrder}
-                        onPress={this.fillOrder.bind(this, i, "C", val.quarts[i],val.halfGals[i])}
-                      >
-                        <Text style={styles.editText}>Close</Text>
-                      </TouchableOpacity>
-                    </DataTable.Cell>
-                  </DataTable.Row>
-                );
-              }
-          })
-        );
-      }
+            }))
+        }}
 
       var menu;
         if (this.props.navigation.state.params.role == "Associate"){
@@ -383,62 +252,19 @@ export default class MiaOrders extends React.Component {
       return (
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.text}>{this.props.navigation.state.params.location} Orders</Text>
+            <Text style={styles.text}>{this.props.navigation.state.params.location} More Information</Text>
           </View>
-          <Searchbar
-            placeholder="Search"
-            style={styles.searchBar}
-            onChangeText={(text) => this.onChangeSearch(text)}
-          ></Searchbar>
-          <ScrollView
-            style={{
-              width: "95%",
-              height: "70%",
-              position: "relative",
-              alignSelf: "center",
-              marginTop: "10%"
-              //top: 250,
-              //right: 200,
-            }}
-          >
-            <DataTable
-              style={{
-                width: "100%",
-                position: "relative",
-                alignSelf: "center",
-                marginTop: 10,
-                flex: 1,
-                borderRadius: 10,
-                borderColor: "black",
-                borderWidth: 1,
-              }}
-            >
-              <DataTable.Header style={{ backgroundColor: "#ABD7EB" }}>
-                <View style={styles.headerView}>
-                <DataTable.Title 
-                  style={styles.infoHeader}>
-                  Order Information
-                </DataTable.Title>
-                
-                </View>
-              </DataTable.Header>
-              <ScrollView>{orders}</ScrollView>
 
-              <DataTable.Pagination
-                page={this.state.page}
-                numberOfPages={1}
-                onPageChange={(page) => {
-                  this.setState({ page: page });
-                }}
-              ></DataTable.Pagination>
-            </DataTable>
-          </ScrollView>
-          {menu}
+              
+              {orders}
+
+              
+            {menu}
         </View>
       );
     }
   }
-}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -467,6 +293,13 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     //left: 70
   },
+  // rowColor:{
+  //   backgroundColor: "#D3D3D3",
+  // },
+
+  // rowColor:nth-of-type(even) {
+  //   backgroundColor: "white",
+  // },
 
   newOrderStyle: {
     width: 130,
@@ -605,6 +438,28 @@ const styles = StyleSheet.create({
     justifyContent:"center",
     flex: 1
   },
+
+  phoneHeader: {
+    position: "relative",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent:"center",
+    flex: 1
+  },
+  addressHeader: {
+    position: "relative",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent:"flex-start",
+    flex: 1
+  },
+  quantityHeader: {
+    position: "relative",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent:"center",
+    flex: 1
+  },
   orderHeader: {
     position: "relative",
     marginTop: 5,
@@ -614,14 +469,27 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#093b15",
   },
-  infoHeader: {
-    fontSize: 18,
+  deliveryDateHeader: {
     position: "relative",
     alignSelf: "center",
     alignItems: "center",
     justifyContent:"flex-start",
+    flex: .5
   },
-  
+  moreInfoHeader: {
+    position: "relative",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent:"flex-start",
+    flex: .2,
+  },
+  claimHeader: {
+    position: "relative",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent:"flex-start",
+    flex: .3
+  },
   editOrder: {
     backgroundColor: "#9AC6A2",
     width: "100%",
