@@ -7,12 +7,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-<<<<<<< HEAD
-    "test": "mocha --recursive --exit"
-=======
+    "test": "mocha --recursive --exit",
     "deploy": "gh-pages -d web-build",
     "predeploy": "expo build:web"
->>>>>>> a055d9a21226a98635818751e31946ded21e04d3
   },
   "dependencies": {
     "@react-native-community/masked-view": "^0.1.10",
